@@ -1,0 +1,11 @@
+pandas
+yfinance
+prophet
+matplotlib
+seaborn
+instagrapi
+feedparser
+textblob
+requests
+streamlit
+plotly
