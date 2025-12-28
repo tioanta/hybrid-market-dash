@@ -36,33 +36,43 @@ def get_technical_forecast(ticker):
         return None, None, None
 
 def get_news_sentiment(keyword):
-    """Membaca berita dan menghitung skor sentimen"""
+    """Membaca berita, menghitung sentimen, DAN mengembalikan daftar berita"""
     try:
         query = keyword.replace(" ", "%20")
         rss_url = f"https://news.google.com/rss/search?q={query}+when:2d&hl=en-ID&gl=ID&ceid=ID:en"
         feed = feedparser.parse(rss_url)
         
-        if not feed.entries: return 0, "No News"
+        news_list = [] # List untuk menyimpan detail berita
+        
+        if not feed.entries: return 0, "No News", []
 
         polarities = []
         for entry in feed.entries[:5]:
             analysis = TextBlob(entry.title)
             polarities.append(analysis.sentiment.polarity)
+            
+            # Simpan detail berita untuk Dashboard
+            news_list.append({
+                'title': entry.title,
+                'link': entry.link,
+                'published': entry.published
+            })
         
-        if not polarities: return 0, "Neutral"
+        if not polarities: return 0, "Neutral", []
 
         avg = sum(polarities) / len(polarities)
         
-        if avg > 0.1: return avg, "Positif 🟢"
-        elif avg < -0.1: return avg, "Negatif 🔴"
-        else: return avg, "Netral ⚪"
+        if avg > 0.1: label = "Positif 🟢"
+        elif avg < -0.1: label = "Negatif 🔴"
+        else: label = "Netral ⚪"
+        
+        return avg, label, news_list # Return 3 values sekarang
         
     except Exception as e:
         print(f"Error News: {e}")
-        return 0, "Error"
+        return 0, "Error", []
 
 def get_hybrid_signal(current, pred, sentiment_score):
-    """Menggabungkan hasil Teknikal dan Sentimen"""
     diff_percent = (pred - current) / current
     
     tech_signal = "HOLD"
