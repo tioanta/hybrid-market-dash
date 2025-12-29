@@ -20,14 +20,14 @@ def get_dynamic_css(sentiment_color):
         .news-card {{
             padding: 15px;
             border-radius: 12px;
-            background-color: #1E1E24; /* Warna background card sedikit lebih terang dari page */
+            background-color: #1E1E24;
             margin-bottom: 12px;
-            border-left: 6px solid {sentiment_color}; /* Warna dinamis */
+            border-left: 6px solid {sentiment_color};
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }}
         .news-card:hover {{
-            transform: translateY(-3px); /* Efek hover naik sedikit */
+            transform: translateY(-3px);
         }}
         .news-title {{
             font-size: 16px;
@@ -45,7 +45,6 @@ def get_dynamic_css(sentiment_color):
             color: #888888;
             font-style: italic;
         }}
-        /* Styling untuk Hero Container Sinyal */
         .signal-box {{
             padding: 25px;
             border-radius: 20px;
@@ -87,7 +86,7 @@ selected_asset = st.sidebar.selectbox(
 st.sidebar.markdown("---")
 if st.sidebar.button("🔄 Refresh Data Real-time", type="primary"):
     st.cache_data.clear()
-    st.experimental_rerun()
+    st.rerun() # <--- PERBAIKAN DI SINI (Sebelumnya st.experimental_rerun)
 
 st.sidebar.markdown("---")
 st.sidebar.info(
@@ -111,24 +110,23 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
             st.stop()
 
         # Tentukan Warna Tema berdasarkan Sinyal & Sentimen
-        signal_color_bg = "#333333" # Default abu-abu
+        signal_color_bg = "#333333" 
         signal_icon = "⚖️"
         if "BUY" in signal:
-            signal_color_bg = "rgba(46, 204, 113, 0.2)" # Hijau transparan
+            signal_color_bg = "rgba(46, 204, 113, 0.2)"
             signal_icon = "🚀"
         elif "SELL" in signal:
-            signal_color_bg = "rgba(231, 76, 60, 0.2)" # Merah transparan
+            signal_color_bg = "rgba(231, 76, 60, 0.2)"
             signal_icon = "🔻"
 
-        sent_color_hex = "#95a5a6" # Default netral
-        if sent_score > 0.1: sent_color_hex = "#2ecc71" # Hijau
-        elif sent_score < -0.1: sent_color_hex = "#e74c3c" # Merah
+        sent_color_hex = "#95a5a6"
+        if sent_score > 0.1: sent_color_hex = "#2ecc71"
+        elif sent_score < -0.1: sent_color_hex = "#e74c3c"
 
         # Inject CSS Dinamis
         st.markdown(get_dynamic_css(sent_color_hex), unsafe_allow_html=True)
 
-        # --- BAGIAN 1: HERO SECTION SINYAL (REKOMENDASI UTAMA) ---
-        # Menggunakan HTML kustom untuk tampilan yang lebih menonjol
+        # --- BAGIAN 1: HERO SECTION SINYAL ---
         st.markdown(f"""
         <div class="signal-box" style="background-color: {signal_color_bg};">
             <h3 style='margin:0; color: #bbb; font-weight: 400;'>Rekomendasi Hybrid AI</h3>
@@ -140,7 +138,6 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
         # --- BAGIAN 2: KARTU METRIK PENDUKUNG ---
         col1, col2, col3 = st.columns(3)
         
-        # Menggunakan custom container agar lebih rapi
         with col1:
             st.markdown('<div class="metric-container">', unsafe_allow_html=True)
             st.metric("💰 Harga Saat Ini", f"{current:,.0f}")
@@ -153,32 +150,29 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
             
         with col3:
             st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-            # Trik untuk mewarnai nilai sentimen
             sent_delta_color = "off"
             if sent_score > 0.1: sent_delta_color = "normal"
             elif sent_score < -0.1: sent_delta_color = "inverse"
             st.metric("📰 Sentimen Berita Global", sent_label, delta=f"Score: {sent_score:.2f}", delta_color=sent_delta_color)
             st.markdown('</div>', unsafe_allow_html=True)
 
-        st.write("") # Spacer
+        st.write("") 
 
-        # --- BAGIAN 3: VISUALISASI GRAFIK MODERN (AREA CHART) ---
+        # --- BAGIAN 3: VISUALISASI GRAFIK MODERN ---
         st.subheader(f"📈 Momentum Pergerakan {selected_asset}")
         
-        df_chart = df.tail(180) # 6 bulan terakhir
+        df_chart = df.tail(180)
         fig = go.Figure()
         
-        # Area Chart Historis
         fig.add_trace(go.Scatter(
             x=df_chart['ds'], y=df_chart['y'],
             mode='lines',
             name='Historis (6 Bulan)',
-            line=dict(color='#4EA8DE', width=3), # Garis lebih tebal
-            fill='tozeroy', # Area fill di bawah garis
-            fillcolor='rgba(78, 168, 222, 0.2)' # Warna fill transparan
+            line=dict(color='#4EA8DE', width=3),
+            fill='tozeroy',
+            fillcolor='rgba(78, 168, 222, 0.2)'
         ))
         
-        # Titik Prediksi yang Menonjol
         pred_date = df_chart['ds'].iloc[-1] + timedelta(days=1)
         fig.add_trace(go.Scatter(
             x=[pred_date], y=[pred],
@@ -186,25 +180,24 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
             name='Target Besok',
             marker=dict(
                 color='#FF9F1C', 
-                size=18, # Lebih besar
-                line=dict(width=3, color='white'), # Outline putih biar pop-up
-                symbol='diamond' # Bentuk diamond
+                size=18,
+                line=dict(width=3, color='white'),
+                symbol='diamond'
             ),
             text=[f"{pred:,.0f}"],
             textposition="top center",
             textfont=dict(color='#FF9F1C', size=14, family="Arial Black")
         ))
 
-        # Kustomisasi Layout Grafik agar lebih bersih
         fig.update_layout(
             template="plotly_dark",
             height=550,
             hovermode="x unified",
-            plot_bgcolor='rgba(0,0,0,0)', # Background transparan
+            plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             xaxis=dict(
-                showgrid=False, # Hilangkan grid vertikal
-                rangeselector=dict( # Tambahkan tombol zoom cepat
+                showgrid=False,
+                rangeselector=dict(
                     buttons=list([
                         dict(count=1, label="1M", step="month", stepmode="backward"),
                         dict(count=3, label="3M", step="month", stepmode="backward"),
@@ -214,22 +207,20 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
                     activecolor="#4EA8DE"
                 ),
             ),
-            yaxis=dict(showgrid=True, gridcolor='#444444', gridwidth=0.5), # Grid horizontal halus
+            yaxis=dict(showgrid=True, gridcolor='#444444', gridwidth=0.5),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
         
         st.plotly_chart(fig, use_container_width=True)
-        st.write("") # Spacer
+        st.write("") 
 
-        # --- BAGIAN 4: BERITA TERKAIT (DINAMIS) ---
+        # --- BAGIAN 4: BERITA TERKAIT ---
         st.subheader(f"🗞️ Berita Penggerak Pasar: {selected_asset}")
         st.caption(f"Warna garis kiri menunjukkan sentimen berita saat ini: **{sent_label}**")
         
         if news_list:
-            # Gunakan container agar bisa di-scroll jika berita banyak
             with st.container():
                 for news in news_list:
-                    # Kartu berita menggunakan CSS dinamis yang sudah diset di atas
                     st.markdown(f"""
                     <div class="news-card">
                         <a href="{news['link']}" target="_blank" class="news-title">{news['title']}</a>
@@ -240,11 +231,9 @@ with st.spinner(f"🤖 Sedang menganalisa jutaan data untuk {selected_asset}..."
             st.warning("⚠️ Tidak ditemukan berita terbaru yang relevan dalam 48 jam terakhir.")
 
     except Exception as e:
-        # Tampilan Error yang lebih rapi
         st.error("Terjadi kesalahan dalam pemrosesan data.")
         with st.expander("Lihat Detail Error"):
             st.code(e)
 
-# Footer minimalis
 st.markdown("---")
 st.markdown("<div style='text-align: center; color: #666;'>Built with ❤️ using Python, Prophet, & Streamlit</div>", unsafe_allow_html=True)
