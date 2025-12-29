@@ -112,9 +112,11 @@ else: # Mode Cari Manual
     display_name = custom_ticker
 
 st.sidebar.markdown("---")
+
+# --- BAGIAN PERBAIKAN REFRESH BUTTON ---
 if st.sidebar.button("🔄 Refresh Data Real-time", type="primary"):
     st.cache_data.clear()
-    st.rerun()
+    st.rerun() # <--- INI PERBAIKANNYA (Bukan st.experimental_rerun)
 
 # --- LOAD DATA ---
 if target_ticker:
