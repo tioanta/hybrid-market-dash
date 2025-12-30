@@ -9,11 +9,18 @@ ASSETS = {
     'BMRI': {'ticker': 'BMRI.JK', 'type': 'stock', 'keyword': 'Bank Mandiri Indonesia stock'}
 }
 
+# --- DAFTAR KANDIDAT BLUE CHIPS (Untuk Portfolio Opt) ---
+BLUE_CHIPS_CANDIDATES = [
+    'BBCA.JK', 'BBRI.JK', 'BMRI.JK', 'BBNI.JK', 
+    'TLKM.JK', 'ASII.JK', 'ICBP.JK', 'UNVR.JK', 
+    'ADRO.JK', 'PTBA.JK', 'GOTO.JK', 'KLBF.JK'
+]
+
 # --- WARNA VISUALISASI ---
 COLORS = {
-    'BELI': '#2ecc71', # Hijau
-    'JUAL': '#e74c3c', # Merah
-    'HOLD': '#95a5a6'  # Abu-abu
+    'BELI': '#2ecc71', 
+    'JUAL': '#e74c3c', 
+    'HOLD': '#95a5a6'
 }
 
 # --- BANK PERTANYAAN ---
