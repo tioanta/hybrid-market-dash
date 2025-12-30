@@ -9,3 +9,4 @@ textblob
 requests
 streamlit
 plotly
+scipy
